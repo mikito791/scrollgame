@@ -14,8 +14,10 @@ TestScene::TestScene(GameObject * parent)
 void TestScene::Initialize()
 {
 	Instantiate<Camera>(this);
+	Instantiate<Field>(this);
+	//Instantiate<Bird>(this);
 	Instantiate<Player>(this);
-	Instantiate<Bird>(this);
+	
 }
 
 //XV

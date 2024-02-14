@@ -3,6 +3,8 @@
 #include <assert.h>
 #include"Stone.h"
 #include"Camera.h"
+#include"Field.h"
+#include"Bird.h"
 namespace
 {
 	const float MOVE_SPEED = 4.0f;
@@ -22,7 +24,9 @@ Player::Player(GameObject* parent) : GameObject(sceneTop)
 	jumpSpeed = 0.0f;
 	onGround = true;
 	frameCounter = 0;
-	
+	animType = 0;
+	animFrame = 0;
+	state = S_Walk;
 }
 
 Player::~Player()
@@ -35,6 +39,16 @@ Player::~Player()
 
 void Player::Update()
 {
+	Field* pField = GetParent()->FindGameObject<Field>();
+	if (state == S_Cry)
+	{
+		frameCounter++;
+		if (frameCounter >= 4)
+		{
+			frameCounter = 0;
+			animFrame = (animFrame + 1) % 2;
+		}
+	}
 	//移動
 	if (CheckHitKey(KEY_INPUT_D))
 	{
@@ -42,6 +56,14 @@ void Player::Update()
 		if (++frameCounter >= 8) {
 			animFrame = (animFrame + 1) % 4;
 			frameCounter = 0;
+		}
+		int hitX = transform_.position_.x + 50;
+		int hitY = transform_.position_.y + 63;
+		
+		if (pField != nullptr)
+		{
+			int push = pField->CollisionRight(hitX, hitY);
+			transform_.position_.x -= push;
 		}
 	}
 	else if (CheckHitKey(KEY_INPUT_A))
@@ -77,13 +99,26 @@ void Player::Update()
 	}
 	jumpSpeed += GRAVITY;//速度　+= 加速度
 	transform_.position_.y += jumpSpeed;//座標　+=　速度
+	if (pField != nullptr)
+	{
+		int pushR = pField->CollisionDown(transform_.position_.x + 50, transform_.position_.y + 63);
+		int pushL = pField->CollisionDown(transform_.position_.x + 14, transform_.position_.y + 63);
+		int push = max(pushR, pushL);//２つの足元のめりこみの大きいほう
+		if (push >=1 ) {
+			transform_.position_.y -= push - 1;
+			jumpSpeed = 0.0f;
+			onGround = true;
+		}else{
+			onGround = false;
+		}
 
-	if (transform_.position_.y >= GROUND)
+	}
+	/*if (transform_.position_.y >= GROUND)
 	{
 		transform_.position_.y = GROUND;
 		jumpSpeed = 0.0f;
 		onGround = true;
-	}
+	}*/
 	/*Memo else
 	{
 		if (transform_.position_.y  GROUND)
@@ -96,14 +131,32 @@ void Player::Update()
 			}
 		}
 	}*/
-
+	//石
 	if (CheckHitKey(KEY_INPUT_M))
 	{
 		Stone* st = Instantiate<Stone>(GetParent());
 		st->SetPosition(transform_.position_);
 	}
+	//鳥
+	std::list<Bird*> pBirds = GetParent()->FindGameObjects<Bird>();
+	if (Bird* pBird :pBieds)
+	{
+		if (pBird->ColliderCircle(transform_.position_.x + 32.0f, transform_.position_.y + 32.0f, 20.0f))
+		{
+			//transform_.position_.y = 0;
+			animType = 4;
+			animFrame = 0;
+			state = S_Cry;
+		}
+	}
+	//カメラ
 	Camera* cam = GetParent()->FindGameObject<Camera>();
-	cam->SetValue(cam->GetValue() + 1);
+	int x = (int)transform_.position_.x - cam->GetValue();
+	if (x > 400)
+	{
+		x = 400;
+		cam->SetValue((int)transform_.position_.x-x);
+	}
 }
 
 void Player::Draw()
@@ -116,4 +169,10 @@ void Player::Draw()
 		x -= cam->GetValue();
 	}
 	DrawRectGraph(x, y, animFrame*64, 0, 64, 64, hImage, TRUE);
+}
+
+void Player::SetPosition(int x, int y)
+{
+	transform_.position_.x = x;
+	transform_.position_.y = y;
 }

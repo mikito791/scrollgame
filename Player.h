@@ -11,6 +11,7 @@ public:
 	~Player();
 	void Update() override;
 	void Draw() override;
+	void SetPosition(int x, int y);
 private:
 	int hImage;
 	GameObject* sceneTop;
@@ -23,5 +24,10 @@ private:
 	int animFrame;//ÉRÉ}
 	int frameCounter;
 
-	
+	enum State
+	{
+		S_Walk=0,
+		S_Cry,
+	};
+	State state;
 };
