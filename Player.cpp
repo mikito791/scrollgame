@@ -5,6 +5,7 @@
 #include"Camera.h"
 #include"Field.h"
 #include"Bird.h"
+#include"TestScene.h"
 namespace
 {
 	const float MOVE_SPEED = 4.0f;
@@ -48,7 +49,11 @@ void Player::Update()
 			frameCounter = 0;
 			animFrame = (animFrame + 1) % 2;
 		}
+		return;
 	}
+	TestScene* scene = dynamic_cast<TestScene*>(GetParent());
+	if (!scene->CanMove())
+		return;
 	//ˆÚ“®
 	if (CheckHitKey(KEY_INPUT_D))
 	{
@@ -139,7 +144,7 @@ void Player::Update()
 	}
 	//’¹
 	std::list<Bird*> pBirds = GetParent()->FindGameObjects<Bird>();
-	if (Bird* pBird :pBieds)
+	for (Bird* pBird :pBirds)
 	{
 		if (pBird->ColliderCircle(transform_.position_.x + 32.0f, transform_.position_.y + 32.0f, 20.0f))
 		{
@@ -147,6 +152,7 @@ void Player::Update()
 			animType = 4;
 			animFrame = 0;
 			state = S_Cry;
+			scene->StartDead();
 		}
 	}
 	//ƒJƒƒ‰

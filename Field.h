@@ -31,4 +31,7 @@ public:
 private:
 	int hImage;
 	bool IsWallBlock(int x, int y);
+	int* Map;
+	int width;
+	int height;
 };
