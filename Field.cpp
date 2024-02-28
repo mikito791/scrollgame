@@ -60,11 +60,6 @@ void Field::Reset()
 				Player * pPlayer = GetParent()->FindGameObject<Player>();
 				pPlayer->SetPosition(w * 32, h * 32);
 				break;
-			case 1://bird
-				//pPlayer->SetPosition(w * 32, h * 32);
-				Bird* pBird=Instantiate<Bird>(this);
-				pBird->SetPosition(w * 32, h * 32);
-				break;
 			}
 		}
 	}

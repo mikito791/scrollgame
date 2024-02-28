@@ -5,7 +5,6 @@
 //コンストラクタ
 CsvReader::CsvReader()
 {
-	data_.clear();
 }
 
 //デストラクタ
@@ -18,8 +17,6 @@ CsvReader::~CsvReader()
 		{
 			data_[y][x].clear();
 		}
-	}
-}
 
 //CSVファイルのロード
 bool CsvReader::Load(std::string fileName)
